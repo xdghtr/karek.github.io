@@ -31,6 +31,7 @@
             color: black;
             font-size: 16px;
             cursor: pointer;
+            margin-top: 10px;
         }
 
         #emulator-container {
@@ -39,6 +40,14 @@
             height: 400px;
             background: black;
             border: 2px solid #555;
+        }
+
+        input[type="file"] {
+            margin-top: 10px;
+            padding: 5px;
+            background: #333;
+            color: white;
+            border: 1px solid #555;
         }
     </style>
     <script src="https://www.pcjs.org/scripts/pcx86.min.js"></script>
@@ -49,7 +58,8 @@
     </header>
     <main>
         <section>
-            <h2>Emulator Systemu</h2>
+            <h2>Załaduj System</h2>
+            <input type="file" id="file-input" accept=".img">
             <button id="start-emulator">Uruchom Emulator</button>
             <div id="emulator-container"></div>
         </section>
@@ -59,10 +69,34 @@
     </footer>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const emulatorContainer = document.getElementById('emulator-container');
+            const fileInput = document.getElementById('file-input');
             const startButton = document.getElementById('start-emulator');
+            const emulatorContainer = document.getElementById('emulator-container');
+            let uploadedFileURL = null;
 
+            // Gdy użytkownik wybiera plik
+            fileInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        uploadedFileURL = e.target.result;
+                        alert("Plik został załadowany pomyślnie!");
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    uploadedFileURL = null;
+                    alert("Nie wybrano pliku.");
+                }
+            });
+
+            // Start emulatora
             startButton.addEventListener('click', () => {
+                if (!uploadedFileURL) {
+                    alert("Najpierw wybierz plik systemu!");
+                    return;
+                }
+
                 emulatorContainer.innerHTML = ''; // Czyszczenie kontenera
 
                 const pc = new PC({
@@ -70,7 +104,7 @@
                     config: {
                         type: "pcx86",
                         floppy: {
-                            "A": "https://archive.org/download/pc-dos-6.1/PC%20DOS%206.1%20-%201.img" // Online obraz dyskietki
+                            "A": uploadedFileURL // Obraz dyskietki od użytkownika
                         },
                         autoStart: true
                     }
