@@ -69,7 +69,7 @@ button:hover {
     height: 600px;
     background-color: #000;
     border: 2px solid #555;
-    display: flex;
+    display: none; /* Początkowo ukryte */
     flex-direction: column;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     z-index: 1000;
