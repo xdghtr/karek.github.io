@@ -25,9 +25,15 @@
         </section>
         
         <section class="emulator">
-            <h2>Emuluj komputer</h2>
-            <div id="pcjs-container"></div>
+            <h2>Emulator Systemu</h2>
             <button id="start-emulator">Uruchom Emulator</button>
+            <div id="emulator-window" class="hidden">
+                <div class="window-header">
+                    <span>Emulator</span>
+                    <button id="close-emulator">&times;</button>
+                </div>
+                <div id="pcjs-container"></div>
+            </div>
         </section>
     </main>
 
