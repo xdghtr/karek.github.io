@@ -3,44 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emulacja Systemów Komputerowych</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Emulacja Systemów PC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1c1c1c;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        main {
+            padding: 20px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ffcc00;
+            border: none;
+            color: black;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #emulator-container {
+            margin: 20px auto;
+            width: 800px;
+            height: 400px;
+            background: black;
+            border: 2px solid #555;
+        }
+    </style>
+    <script src="https://www.pcjs.org/scripts/pcx86.min.js"></script>
 </head>
 <body>
     <header>
-        <h1>Emulacja Starych Systemów PC</h1>
-        <nav>
-            <ul>
-                <li><a href="#">Strona Główna</a></li>
-                <li><a href="#">O Projekcie</a></li>
-                <li><a href="#">Systemy</a></li>
-                <li><a href="#">Dokumentacja</a></li>
-            </ul>
-        </nav>
+        <h1>Emulacja Systemów PC</h1>
     </header>
     <main>
-        <section class="intro">
-            <h2>Witaj w świecie emulacji systemów komputerowych!</h2>
-            <p>Uruchamiaj klasyczne systemy operacyjne i aplikacje na współczesnym sprzęcie.</p>
-        </section>
-        
-        <section class="emulator">
+        <section>
             <h2>Emulator Systemu</h2>
             <button id="start-emulator">Uruchom Emulator</button>
-            <div id="emulator-window" class="hidden">
-                <div class="window-header">
-                    <span>Emulator</span>
-                    <button id="close-emulator">&times;</button>
-                </div>
-                <div id="pcjs-container"></div>
-            </div>
+            <div id="emulator-container"></div>
         </section>
     </main>
-
     <footer>
-        <p>&copy; 2025 Twoja Strona z Emulacjami. Wszelkie prawa zastrzeżone.</p>
+        <p>&copy; 2025 Emulator Online. Wszelkie prawa zastrzeżone.</p>
     </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const emulatorContainer = document.getElementById('emulator-container');
+            const startButton = document.getElementById('start-emulator');
 
-    <script src="script.js"></script>
+            startButton.addEventListener('click', () => {
+                emulatorContainer.innerHTML = ''; // Czyszczenie kontenera
+
+                const pc = new PC({
+                    container: emulatorContainer,
+                    config: {
+                        type: "pcx86",
+                        floppy: {
+                            "A": "https://www.pcjs.org/disks/pcx86/dos/3.30/PC-DOS-3.30.img" // Online obraz dyskietki
+                        },
+                        autoStart: true
+                    }
+                });
+
+                pc.start();
+            });
+        });
+    </script>
 </body>
 </html>
