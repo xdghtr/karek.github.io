@@ -1,1 +1,41 @@
-<h1>siema<h1>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emulacja Systemów Komputerowych</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Emulacja Starych Systemów PC</h1>
+        <nav>
+            <ul>
+                <li><a href="#">Strona Główna</a></li>
+                <li><a href="#">O Projekcie</a></li>
+                <li><a href="#">Systemy</a></li>
+                <li><a href="#">Dokumentacja</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="intro">
+            <h2>Witaj w świecie emulacji systemów komputerowych!</h2>
+            <p>Uruchamiaj klasyczne systemy operacyjne i aplikacje na współczesnym sprzęcie.</p>
+        </section>
+        
+        <section class="emulator">
+            <h2>Emuluj komputer</h2>
+            <div id="pcjs-container"></div>
+            <button id="start-emulator">Uruchom Emulator</button>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Twoja Strona z Emulacjami. Wszelkie prawa zastrzeżone.</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/pcjs@0.3.0/dist/pcjs.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
