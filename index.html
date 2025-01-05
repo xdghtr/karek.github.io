@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft 3D - Simplified</title>
+    <title>3D Minecraft Game</title>
     <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/examples/js/controls/PointerLockControls.js"></script>
     <style>
@@ -42,56 +42,50 @@
     <div id="gui">FPS: <span id="fps">0</span></div>
     <div id="instructions">Kliknij, aby rozpocząć grę.</div>
     <script>
-        // Zmienne globalne
         let scene, camera, renderer, controls, clock;
         let world = [];
         const blockSize = 1;
         const worldSize = 16;
         const buildDistance = 8;
-
         let raycaster = new THREE.Raycaster();
         let mouse = new THREE.Vector2();
         let selectedBlock = null;
-
         let fpsCounter = document.getElementById('fps');
         let instructions = document.getElementById('instructions');
 
-        // Inicjalizacja gry
         function init() {
             scene = new THREE.Scene();
             clock = new THREE.Clock();
-
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(worldSize / 2, 5, worldSize / 2);
-
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
-            // Kontrola ruchu gracza
             controls = new THREE.PointerLockControls(camera, document.body);
             document.body.addEventListener('click', () => controls.lock());
             controls.addEventListener('lock', () => instructions.style.display = 'none');
             controls.addEventListener('unlock', () => instructions.style.display = 'block');
 
-            // Światło
             const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
             light.position.set(0, 20, 0);
             scene.add(light);
 
-            // Generowanie świata
-            generateWorld();
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(5, 10, 5);
+            scene.add(directionalLight);
 
-            // Obsługa klawiatury
+            generateWorld();
             window.addEventListener('keydown', handleKeyDown);
             window.addEventListener('mousedown', handleMouseDown);
 
             animate();
         }
 
-        // Generowanie świata (bloki)
         function generateWorld() {
             const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
+            const dirtMaterial = new THREE.MeshStandardMaterial({ color: 0x7f4f24 });
+
             for (let x = 0; x < worldSize; x++) {
                 world[x] = [];
                 for (let z = 0; z < worldSize; z++) {
@@ -102,17 +96,25 @@
                     block.position.set(x, 0, z);
                     scene.add(block);
                     world[x][z] = block;
+
+                    // Dodanie kilku "brudnych" bloków do świata
+                    if (x % 5 === 0 && z % 5 === 0) {
+                        const dirtBlock = new THREE.Mesh(
+                            new THREE.BoxGeometry(blockSize, blockSize, blockSize),
+                            dirtMaterial
+                        );
+                        dirtBlock.position.set(x, 1, z);
+                        scene.add(dirtBlock);
+                    }
                 }
             }
         }
 
-        // Obsługa klawiszy
         function handleKeyDown(event) {
             if (event.key === 'b') addBlock();
             if (event.key === 'n') removeBlock();
         }
 
-        // Dodawanie bloku
         function addBlock() {
             if (selectedBlock && selectedBlock.position.distanceTo(camera.position) < buildDistance) {
                 const newBlock = selectedBlock.clone();
@@ -121,7 +123,6 @@
             }
         }
 
-        // Usuwanie bloku
         function removeBlock() {
             if (selectedBlock && selectedBlock.position.distanceTo(camera.position) < buildDistance) {
                 scene.remove(selectedBlock);
@@ -129,24 +130,20 @@
             }
         }
 
-        // Obsługa myszy
         function handleMouseDown(event) {
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
             mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
             raycaster.setFromCamera(mouse, camera);
-
             const intersects = raycaster.intersectObjects(scene.children, false);
             if (intersects.length > 0) {
                 selectedBlock = intersects[0].object;
             }
         }
 
-        // Aktualizacja gry
         function animate() {
             requestAnimationFrame(animate);
 
-            // Obliczanie FPS
             const delta = clock.getDelta();
             const fps = Math.round(1 / delta);
             fpsCounter.innerText = fps;
