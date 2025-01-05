@@ -1,118 +1,17 @@
-<!DOCTYPE html>
-<html lang="pl">
+<!doctype html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emulacja Systemów PC</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1c1c1c;
-            color: white;
-            margin: 0;
-            padding: 0;
-        }
-
-        header {
-            background-color: #333;
-            text-align: center;
-            padding: 20px 0;
-        }
-
-        main {
-            padding: 20px;
-            text-align: center;
-        }
-
-        button {
-            padding: 10px 20px;
-            background-color: #ffcc00;
-            border: none;
-            color: black;
-            font-size: 16px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        #emulator-container {
-            margin: 20px auto;
-            width: 800px;
-            height: 400px;
-            background: black;
-            border: 2px solid #555;
-        }
-
-        input[type="file"] {
-            margin-top: 10px;
-            padding: 5px;
-            background: #333;
-            color: white;
-            border: 1px solid #555;
-        }
-    </style>
-    <script src="https://www.pcjs.org/scripts/pcx86.min.js"></script>
+	<meta charset="utf-8">
+	<meta name="publisher" content="KarekYT">
+	<meta http-equiv="refresh" content="0.1">
+	<meta name="generator" content="MetBod (https://www.kurshtml.edu.pl/generatory/metbod.html)">
+	<meta name="robots" content="all">
+	<meta name="viewport" content="width=device-width, height=device-height">
+        <h1>djfdkfi {publisher}<h1>
 </head>
 <body>
-    <header>
-        <h1>Emulacja Systemów PC</h1>
-    </header>
-    <main>
-        <section>
-            <h2>Załaduj System</h2>
-            <input type="file" id="file-input" accept=".img">
-            <button id="start-emulator">Uruchom Emulator</button>
-            <div id="emulator-container"></div>
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2025 Emulator Online. Wszelkie prawa zastrzeżone.</p>
-    </footer>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const fileInput = document.getElementById('file-input');
-            const startButton = document.getElementById('start-emulator');
-            const emulatorContainer = document.getElementById('emulator-container');
-            let uploadedFileURL = null;
 
-            // Gdy użytkownik wybiera plik
-            fileInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        uploadedFileURL = e.target.result;
-                        alert("Plik został załadowany pomyślnie!");
-                    };
-                    reader.readAsDataURL(file);
-                } else {
-                    uploadedFileURL = null;
-                    alert("Nie wybrano pliku.");
-                }
-            });
 
-            // Start emulatora
-            startButton.addEventListener('click', () => {
-                if (!uploadedFileURL) {
-                    alert("Najpierw wybierz plik systemu!");
-                    return;
-                }
 
-                emulatorContainer.innerHTML = ''; // Czyszczenie kontenera
-
-                const pc = new PC({
-                    container: emulatorContainer,
-                    config: {
-                        type: "pcx86",
-                        floppy: {
-                            "A": uploadedFileURL // Obraz dyskietki od użytkownika
-                        },
-                        autoStart: true
-                    }
-                });
-
-                pc.start();
-            });
-        });
-    </script>
 </body>
 </html>
