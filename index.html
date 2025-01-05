@@ -3,155 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Minecraft Game</title>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.157.0/examples/js/controls/PointerLockControls.js"></script>
+    <title>3D Game with Three.js</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
-        #gui {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 18px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            z-index: 10;
-        }
-        #instructions {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
-            color: white;
-            text-align: center;
-            display: none;
-        }
-        canvas {
-            display: block;
-        }
+        body { margin: 0; }
+        canvas { display: block; }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 <body>
-    <div id="gui">FPS: <span id="fps">0</span></div>
-    <div id="instructions">Kliknij, aby rozpocząć grę.</div>
     <script>
-        let scene, camera, renderer, controls, clock;
-        let world = [];
-        const blockSize = 1;
-        const worldSize = 16;
-        const buildDistance = 8;
-        let raycaster = new THREE.Raycaster();
-        let mouse = new THREE.Vector2();
-        let selectedBlock = null;
-        let fpsCounter = document.getElementById('fps');
-        let instructions = document.getElementById('instructions');
+        // Tworzenie sceny
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB);  // Tło niebieskie (jak niebo)
 
-        function init() {
-            scene = new THREE.Scene();
-            clock = new THREE.Clock();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            camera.position.set(worldSize / 2, 5, worldSize / 2);
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
+        // Tworzenie kamery
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;  // Ustawiamy kamerę, żeby była w odpowiedniej odległości
 
-            controls = new THREE.PointerLockControls(camera, document.body);
-            document.body.addEventListener('click', () => controls.lock());
-            controls.addEventListener('lock', () => instructions.style.display = 'none');
-            controls.addEventListener('unlock', () => instructions.style.display = 'block');
+        // Tworzenie renderera
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-            const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
-            light.position.set(0, 20, 0);
-            scene.add(light);
+        // Dodanie światła
+        const light = new THREE.PointLight(0xffffff, 1, 100);
+        light.position.set(10, 10, 10);
+        scene.add(light);
 
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-            directionalLight.position.set(5, 10, 5);
-            scene.add(directionalLight);
+        // Tworzenie gracza - prosta kula
+        const playerGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+        const playerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+        const player = new THREE.Mesh(playerGeometry, playerMaterial);
+        scene.add(player);
 
-            generateWorld();
-            window.addEventListener('keydown', handleKeyDown);
-            window.addEventListener('mousedown', handleMouseDown);
+        // Tworzenie obiektów do zebrania
+        const itemGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3);
+        const itemMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+        const item = new THREE.Mesh(itemGeometry, itemMaterial);
+        item.position.set(3, 1, 0);
+        scene.add(item);
 
-            animate();
-        }
+        // Obsługa ruchu gracza
+        let moveForward = false;
+        let moveBackward = false;
+        let moveLeft = false;
+        let moveRight = false;
 
-        function generateWorld() {
-            const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228b22 });
-            const dirtMaterial = new THREE.MeshStandardMaterial({ color: 0x7f4f24 });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'w') moveForward = true;
+            if (event.key === 's') moveBackward = true;
+            if (event.key === 'a') moveLeft = true;
+            if (event.key === 'd') moveRight = true;
+        });
 
-            for (let x = 0; x < worldSize; x++) {
-                world[x] = [];
-                for (let z = 0; z < worldSize; z++) {
-                    const block = new THREE.Mesh(
-                        new THREE.BoxGeometry(blockSize, blockSize, blockSize),
-                        groundMaterial
-                    );
-                    block.position.set(x, 0, z);
-                    scene.add(block);
-                    world[x][z] = block;
+        document.addEventListener('keyup', (event) => {
+            if (event.key === 'w') moveForward = false;
+            if (event.key === 's') moveBackward = false;
+            if (event.key === 'a') moveLeft = false;
+            if (event.key === 'd') moveRight = false;
+        });
 
-                    // Dodanie kilku "brudnych" bloków do świata
-                    if (x % 5 === 0 && z % 5 === 0) {
-                        const dirtBlock = new THREE.Mesh(
-                            new THREE.BoxGeometry(blockSize, blockSize, blockSize),
-                            dirtMaterial
-                        );
-                        dirtBlock.position.set(x, 1, z);
-                        scene.add(dirtBlock);
-                    }
-                }
-            }
-        }
-
-        function handleKeyDown(event) {
-            if (event.key === 'b') addBlock();
-            if (event.key === 'n') removeBlock();
-        }
-
-        function addBlock() {
-            if (selectedBlock && selectedBlock.position.distanceTo(camera.position) < buildDistance) {
-                const newBlock = selectedBlock.clone();
-                newBlock.position.y += blockSize;
-                scene.add(newBlock);
-            }
-        }
-
-        function removeBlock() {
-            if (selectedBlock && selectedBlock.position.distanceTo(camera.position) < buildDistance) {
-                scene.remove(selectedBlock);
-                selectedBlock = null;
-            }
-        }
-
-        function handleMouseDown(event) {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(scene.children, false);
-            if (intersects.length > 0) {
-                selectedBlock = intersects[0].object;
-            }
-        }
-
+        // Funkcja do animacji
         function animate() {
             requestAnimationFrame(animate);
 
-            const delta = clock.getDelta();
-            const fps = Math.round(1 / delta);
-            fpsCounter.innerText = fps;
+            // Ruch gracza
+            if (moveForward) player.position.z -= 0.1;
+            if (moveBackward) player.position.z += 0.1;
+            if (moveLeft) player.position.x -= 0.1;
+            if (moveRight) player.position.x += 0.1;
+
+            // Sprawdzanie, czy gracz zebrał przedmiot
+            const distance = player.position.distanceTo(item.position);
+            if (distance < 1) {
+                // Gracz zebrał przedmiot
+                item.position.set(Math.random() * 10 - 5, Math.random() * 5, Math.random() * 10 - 5);
+                console.log("Item collected!");
+            }
 
             renderer.render(scene, camera);
         }
 
-        init();
+        animate();
     </script>
 </body>
 </html>
