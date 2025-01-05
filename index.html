@@ -9,6 +9,26 @@
         body {
             margin: 0;
             overflow: hidden;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        #game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            text-align: center;
+            display: none;
         }
         canvas {
             display: block;
@@ -16,109 +36,130 @@
     </style>
 </head>
 <body>
-<script>
-    // Inicjalizacja sceny, kamery i renderera
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87ceeb); // Niebieskie niebo
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    <div id="score">Punkty: 0</div>
+    <div id="game-over">GAME OVER<br><button onclick="restartGame()">Restart</button></div>
+    <script>
+        let scene, camera, renderer, car, obstacles = [];
+        let speed = 0.1, maxSpeed = 0.2, turnSpeed = 0.03;
+        let keys = { ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false };
+        let score = 0, isGameOver = false;
 
-    // Dodanie światła
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-    scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight.position.set(5, 10, 5);
-    scene.add(directionalLight);
+        // Inicjalizacja sceny
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87ceeb);
 
-    // Tworzenie toru wyścigowego
-    const trackGeometry = new THREE.PlaneGeometry(50, 200);
-    const trackMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
-    const track = new THREE.Mesh(trackGeometry, trackMaterial);
-    track.rotation.x = -Math.PI / 2;
-    scene.add(track);
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 5, 10);
+            camera.lookAt(0, 0, 0);
 
-    // Dodanie linii na torze
-    const lineGeometry = new THREE.PlaneGeometry(0.2, 200);
-    const lineMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    for (let i = -2; i <= 2; i++) {
-        const line = new THREE.Mesh(lineGeometry, lineMaterial);
-        line.position.x = i * 2;
-        line.rotation.x = -Math.PI / 2;
-        scene.add(line);
-    }
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
 
-    // Tworzenie samochodu
-    const carGeometry = new THREE.BoxGeometry(1, 0.5, 2);
-    const carMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
-    const car = new THREE.Mesh(carGeometry, carMaterial);
-    car.position.y = 0.5;
-    scene.add(car);
+            // Tor
+            const trackGeometry = new THREE.PlaneGeometry(10, 1000);
+            const trackMaterial = new THREE.MeshStandardMaterial({ color: 0x333333 });
+            const track = new THREE.Mesh(trackGeometry, trackMaterial);
+            track.rotation.x = -Math.PI / 2;
+            scene.add(track);
 
-    // Pozycja kamery
-    camera.position.set(0, 5, 10);
-    camera.lookAt(0, 0, 0);
+            // Linie na torze
+            const lineGeometry = new THREE.PlaneGeometry(0.1, 1000);
+            const lineMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            for (let i = -4; i <= 4; i += 2) {
+                const line = new THREE.Mesh(lineGeometry, lineMaterial);
+                line.position.x = i;
+                line.rotation.x = -Math.PI / 2;
+                scene.add(line);
+            }
 
-    // Klawisze sterowania
-    const keys = {
-        ArrowUp: false,
-        ArrowDown: false,
-        ArrowLeft: false,
-        ArrowRight: false,
-    };
+            // Samochód
+            const carGeometry = new THREE.BoxGeometry(1, 0.5, 2);
+            const carMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+            car = new THREE.Mesh(carGeometry, carMaterial);
+            car.position.y = 0.5;
+            scene.add(car);
 
-    window.addEventListener('keydown', (event) => {
-        if (keys.hasOwnProperty(event.key)) keys[event.key] = true;
-    });
+            // Światło
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(5, 10, 5);
+            scene.add(directionalLight);
 
-    window.addEventListener('keyup', (event) => {
-        if (keys.hasOwnProperty(event.key)) keys[event.key] = false;
-    });
+            // Obsługa klawiatury
+            window.addEventListener('keydown', (event) => {
+                if (keys.hasOwnProperty(event.key)) keys[event.key] = true;
+            });
+            window.addEventListener('keyup', (event) => {
+                if (keys.hasOwnProperty(event.key)) keys[event.key] = false;
+            });
 
-    // Logika ruchu
-    let speed = 0;
-    const maxSpeed = 0.2;
-    const acceleration = 0.01;
-    const friction = 0.005;
-    const turnSpeed = 0.03;
-
-    function animate() {
-        requestAnimationFrame(animate);
-
-        // Przyspieszanie i hamowanie
-        if (keys.ArrowUp) speed = Math.min(speed + acceleration, maxSpeed);
-        if (keys.ArrowDown) speed = Math.max(speed - acceleration, -maxSpeed);
-
-        // Tarcie
-        if (!keys.ArrowUp && !keys.ArrowDown) {
-            if (speed > 0) speed = Math.max(speed - friction, 0);
-            if (speed < 0) speed = Math.min(speed + friction, 0);
+            // Generowanie przeszkód
+            generateObstacles();
+            animate();
         }
 
-        // Skręcanie
-        if (keys.ArrowLeft) car.rotation.y += turnSpeed;
-        if (keys.ArrowRight) car.rotation.y -= turnSpeed;
+        // Tworzenie przeszkód
+        function generateObstacles() {
+            for (let i = 0; i < 20; i++) {
+                const obstacleGeometry = new THREE.BoxGeometry(1, 0.5, 1);
+                const obstacleMaterial = new THREE.MeshStandardMaterial({ color: 0x000000 });
+                const obstacle = new THREE.Mesh(obstacleGeometry, obstacleMaterial);
+                obstacle.position.set((Math.random() - 0.5) * 8, 0.25, -Math.random() * 500);
+                obstacles.push(obstacle);
+                scene.add(obstacle);
+            }
+        }
 
-        // Ruch samochodu
-        car.position.x -= Math.sin(car.rotation.y) * speed;
-        car.position.z -= Math.cos(car.rotation.y) * speed;
+        // Aktualizacja przeszkód
+        function updateObstacles() {
+            obstacles.forEach(obstacle => {
+                obstacle.position.z += speed * 5;
+                if (obstacle.position.z > 10) {
+                    obstacle.position.z = -500;
+                    obstacle.position.x = (Math.random() - 0.5) * 8;
+                }
+                // Sprawdzenie kolizji
+                if (Math.abs(car.position.x - obstacle.position.x) < 1 &&
+                    Math.abs(car.position.z - obstacle.position.z) < 1.5) {
+                    endGame();
+                }
+            });
+        }
 
-        // Ruch kamery za samochodem
-        camera.position.set(car.position.x, car.position.y + 5, car.position.z + 10);
-        camera.lookAt(car.position);
+        // Animacja
+        function animate() {
+            if (isGameOver) return;
+            requestAnimationFrame(animate);
 
-        renderer.render(scene, camera);
-    }
+            // Sterowanie samochodem
+            if (keys.ArrowLeft) car.position.x = Math.max(car.position.x - turnSpeed, -4);
+            if (keys.ArrowRight) car.position.x = Math.min(car.position.x + turnSpeed, 4);
 
-    animate();
+            // Aktualizacja przeszkód
+            updateObstacles();
 
-    // Obsługa zmiany rozmiaru okna
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-</script>
+            // Zwiększanie punktów
+            score += Math.round(speed * 100);
+            document.getElementById('score').innerText = `Punkty: ${score}`;
+
+            renderer.render(scene, camera);
+        }
+
+        // Koniec gry
+        function endGame() {
+            isGameOver = true;
+            document.getElementById('game-over').style.display = 'block';
+        }
+
+        // Restart gry
+        function restartGame() {
+            window.location.reload();
+        }
+
+        init();
+    </script>
 </body>
 </html>
