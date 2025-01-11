@@ -1,132 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3D Maze Game with Three.js</title>
-    <style>
-        body { margin: 0; overflow: hidden; }
-        canvas { display: block; }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows XP Interface</title>
+  <style>
+    /* Tło pulpitu */
+    body {
+      margin: 0;
+      background: url('https://upload.wikimedia.org/wikipedia/en/a/a4/Bliss_%28Windows_XP%29.png') no-repeat center center;
+      background-size: cover;
+      font-family: 'Tahoma', sans-serif;
+    }
+    .desktop {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    /* Pasek zadań */
+    .taskbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #c3d9ff;
+      border-top: 2px solid #6c91c2;
+      height: 40px;
+      padding: 0 10px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+    }
+
+    .start-button {
+      display: flex;
+      align-items: center;
+      background: #ffffff;
+      border: 2px solid #6c91c2;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .start-button img {
+      width: 16px;
+      height: 16px;
+      margin-right: 5px;
+    }
+
+    .taskbar-clock {
+      font-size: 14px;
+    }
+
+    /* Okienka */
+    .window {
+      width: 300px;
+      border: 2px solid #6c91c2;
+      background: #ffffff;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+      position: absolute;
+      top: 100px;
+      left: 100px;
+    }
+
+    .title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #0078d7;
+      color: #ffffff;
+      padding: 5px;
+      cursor: move;
+    }
+
+    .title-bar-controls button {
+      width: 16px;
+      height: 16px;
+      background: #ffffff;
+      border: 1px solid #6c91c2;
+      margin-left: 2px;
+      cursor: pointer;
+    }
+
+    .window-body {
+      padding: 10px;
+    }
+  </style>
 </head>
 <body>
-    <script>
-        // Podstawowe ustawienia sceny, kamery i renderera
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+  <div class="desktop">
+    <!-- Pasek zadań -->
+    <div class="taskbar">
+      <div class="start-button">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Windows_XP_logo.svg/32px-Windows_XP_logo.svg.png" alt="Start">
+        Start
+      </div>
+      <div class="taskbar-clock">12:00</div>
+    </div>
 
-        // Światło
-        const light = new THREE.PointLight(0xffffff, 1, 100);
-        light.position.set(10, 10, 10);
-        scene.add(light);
+    <!-- Okienko -->
+    <div class="window" id="my-computer">
+      <div class="title-bar">
+        <div class="title-bar-text">My Computer</div>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize"></button>
+          <button aria-label="Maximize"></button>
+          <button aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="window-body">
+        <p>Welcome to Windows XP!</p>
+      </div>
+    </div>
+  </div>
 
-        // Gracz - kamera FPS
-        const player = new THREE.Object3D();
-        camera.position.set(0, 1.5, 0);  // Ustawienie kamery na odpowiedniej wysokości
-        player.add(camera);
-        scene.add(player);
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const windows = document.querySelectorAll(".window");
 
-        // Ruch gracza
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let velocity = new THREE.Vector3();
-        const speed = 0.1;
+      windows.forEach((win) => {
+        const titleBar = win.querySelector(".title-bar");
+        let isDragging = false, offsetX, offsetY;
 
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'w') moveForward = true;
-            if (event.key === 's') moveBackward = true;
-            if (event.key === 'a') moveLeft = true;
-            if (event.key === 'd') moveRight = true;
+        titleBar.addEventListener("mousedown", (e) => {
+          isDragging = true;
+          offsetX = e.offsetX;
+          offsetY = e.offsetY;
+          win.style.position = "absolute";
         });
 
-        document.addEventListener('keyup', (event) => {
-            if (event.key === 'w') moveForward = false;
-            if (event.key === 's') moveBackward = false;
-            if (event.key === 'a') moveLeft = false;
-            if (event.key === 'd') moveRight = false;
+        document.addEventListener("mousemove", (e) => {
+          if (isDragging) {
+            win.style.left = `${e.pageX - offsetX}px`;
+            win.style.top = `${e.pageY - offsetY}px`;
+          }
         });
 
-        // Labirynt
-        const maze = new THREE.Group();
-        const wallMaterial = new THREE.MeshBasicMaterial({ color: 0x888888 });
-        const floorMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-
-        // Funkcja do tworzenia ścian labiryntu
-        function createWall(x, y, z, width, height, depth) {
-            const geometry = new THREE.BoxGeometry(width, height, depth);
-            const wall = new THREE.Mesh(geometry, wallMaterial);
-            wall.position.set(x, y, z);
-            maze.add(wall);
-        }
-
-        // Stworzenie prostego labiryntu
-        createWall(0, 1, 0, 10, 2, 1);   // Ściana
-        createWall(10, 1, 0, 10, 2, 1);  // Ściana
-        createWall(5, 1, -5, 1, 2, 10);  // Ściana
-        createWall(5, 1, 5, 1, 2, 10);   // Ściana
-        createWall(0, 1, 5, 1, 2, 10);   // Ściana
-        createWall(10, 1, 5, 1, 2, 10);  // Ściana
-        scene.add(maze);
-
-        // Przeszkody - punkty do zebrania
-        const points = [];
-        const pointMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-
-        function createPoint(x, y, z) {
-            const geometry = new THREE.SphereGeometry(0.2, 8, 8);
-            const point = new THREE.Mesh(geometry, pointMaterial);
-            point.position.set(x, y, z);
-            points.push(point);
-            scene.add(point);
-        }
-
-        // Dodanie punktów w różnych miejscach labiryntu
-        createPoint(3, 1.5, -4);
-        createPoint(7, 1.5, -4);
-        createPoint(7, 1.5, 4);
-
-        // Detekcja kolizji (prosta detekcja na bazie odległości)
-        function checkCollision(player) {
-            for (let point of points) {
-                const distance = player.position.distanceTo(point.position);
-                if (distance < 1) {
-                    scene.remove(point);  // Usuwamy punkt, gdy gracz go zbierze
-                    console.log("Point collected!");
-                }
-            }
-        }
-
-        // Animacja i aktualizacja
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Ruch gracza
-            if (moveForward) velocity.z = -speed;
-            if (moveBackward) velocity.z = speed;
-            if (moveLeft) velocity.x = -speed;
-            if (moveRight) velocity.x = speed;
-
-            player.position.add(velocity);  // Aktualizowanie pozycji gracza
-            checkCollision(player);  // Sprawdzanie, czy gracz zebrał punkt
-
-            // Ustawienie kamery, aby podążała za graczem
-            camera.position.x = player.position.x;
-            camera.position.z = player.position.z + 1;
-
-            renderer.render(scene, camera);
-        }
-
-        // Rozmiar okna
-        window.addEventListener('resize', () => {
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-        });
-
-        animate();
-    </script>
+        document.addEventListener("mouseup", () => (isDragging = false));
+      });
+    });
+  </script>
 </body>
 </html>
