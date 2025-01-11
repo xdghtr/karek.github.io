@@ -11,46 +11,183 @@
         body {
             background-color: #008080;
             font-family: 'Arial', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
         }
         #root {
-            height: 100vh;
+            flex-grow: 1;
+        }
+
+        /* PASEK ZADAŃ */
+        .taskbar {
+            background-color: #000080;
+            padding: 10px;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .taskbar .start-btn {
+            background-color: #000080;
+            color: white;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .taskbar .start-btn:hover {
+            background-color: #1e90ff;
+        }
+
+        .taskbar .taskbar-apps {
+            display: flex;
+            gap: 10px;
+        }
+
+        .taskbar .taskbar-apps .app {
+            background-color: #1e90ff;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .taskbar .taskbar-apps .app:hover {
+            background-color: #4682b4;
+        }
+
+        /* STYLIZACJA OKIEN */
+        .window {
+            background-color: #ffffff;
+            border: 2px solid #000000;
+            width: 350px;
+            height: 200px;
+            position: absolute;
+            top: 50px;
+            left: 50px;
+            display: none;
+            z-index: 10;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease-out;
+        }
+
+        .window-header {
+            background-color: #000080;
+            color: white;
+            padding: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: move;
+        }
+
+        .window-header span {
+            font-weight: bold;
+        }
+
+        .window-body {
+            padding: 10px;
+            font-size: 14px;
+            overflow-y: auto;
+        }
+
+        .window-header .close-btn {
+            background-color: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .window-header .close-btn:hover {
+            background-color: darkred;
+        }
+
+        /* Stylizacja dla tekstowego edytora */
+        textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script>
-        const { Window, Taskbar, StartMenu, Button, TaskbarApp } = ReactWindows95;
+<div id="root"></div>
 
-        function App() {
-            return (
-                <div style={{ height: '100%' }}>
-                    {/* Taskbar */}
-                    <Taskbar>
-                        <StartMenu>
-                            <Button>My Computer</Button>
-                            <Button>Notepad</Button>
-                        </StartMenu>
-                        <TaskbarApp icon="📂" title="My Computer" />
-                        <TaskbarApp icon="📝" title="Notepad" />
-                    </Taskbar>
+<script>
+    const { Window, Taskbar, StartMenu, Button, TaskbarApp } = ReactWindows95;
 
-                    {/* Okno "My Computer" */}
-                    <Window title="My Computer">
-                        <p>This is your "My Computer" window.</p>
-                    </Window>
+    // Prosta animacja dla okienek
+    function moveWindow(event, windowId) {
+        const windowElement = document.getElementById(windowId);
+        let offsetX = event.clientX - windowElement.offsetLeft;
+        let offsetY = event.clientY - windowElement.offsetTop;
 
-                    {/* Okno "Notepad" */}
-                    <Window title="Notepad">
-                        <textarea rows="10" cols="30">Type your text here...</textarea>
-                    </Window>
-                </div>
-            );
+        function dragMove(event) {
+            windowElement.style.left = `${event.clientX - offsetX}px`;
+            windowElement.style.top = `${event.clientY - offsetY}px`;
         }
 
-        // Renderowanie aplikacji
-        ReactDOM.render(<App />, document.getElementById('root'));
-    </script>
+        function dragEnd() {
+            windowElement.removeEventListener('mousemove', dragMove);
+            windowElement.removeEventListener('mouseup', dragEnd);
+        }
+
+        windowElement.addEventListener('mousemove', dragMove);
+        windowElement.addEventListener('mouseup', dragEnd);
+    }
+
+    function App() {
+        return (
+            <div style={{ height: '100%', position: 'relative' }}>
+                {/* Taskbar */}
+                <div className="taskbar">
+                    <button className="start-btn">Start</button>
+                    <div className="taskbar-apps">
+                        <div className="app" onClick={() => toggleWindow('my-computer')}>My Computer</div>
+                        <div className="app" onClick={() => toggleWindow('notepad')}>Notepad</div>
+                    </div>
+                </div>
+
+                {/* Okno "My Computer" */}
+                <Window id="my-computer" title="My Computer" style={{ top: '100px', left: '50px' }} onMouseDown={(event) => moveWindow(event, 'my-computer')}>
+                    <div className="window-body">
+                        <p>This is your "My Computer" window.</p>
+                    </div>
+                </Window>
+
+                {/* Okno "Notepad" */}
+                <Window id="notepad" title="Notepad" style={{ top: '250px', left: '50px' }} onMouseDown={(event) => moveWindow(event, 'notepad')}>
+                    <div className="window-body">
+                        <textarea rows="10" cols="30">Type your text here...</textarea>
+                    </div>
+                </Window>
+            </div>
+        );
+    }
+
+    function toggleWindow(windowId) {
+        const windowElement = document.getElementById(windowId);
+        windowElement.style.display = windowElement.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // Renderowanie aplikacji
+    ReactDOM.render(<App />, document.getElementById('root'));
+</script>
 </body>
 </html>
