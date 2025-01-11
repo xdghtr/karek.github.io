@@ -162,3 +162,59 @@
     <img src="https://cdn.jsdelivr.net/gh/typicons/typicons@2.1.2/src/svg/trash.svg" alt="Kosz">
     <span>Kosz</span>
   </div>
+
+  <!-- Pasek zadań -->
+  <div class="taskbar">
+    <div class="start-button" onclick="toggleStartMenu()">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/Windows_XP_logo.svg/32px-Windows_XP_logo.svg.png" alt="Start">
+      Start
+    </div>
+    <div class="taskbar-clock" id="clock">12:00</div>
+  </div>
+
+  <!-- Menu Start -->
+  <div class="start-menu" id="start-menu">
+    <ul>
+      <li><a href="#">Mój komputer</a></li>
+      <li><a href="#">Panel sterowania</a></li>
+      <li><a href="#">Programy</a></li>
+      <li><a href="#">Ustawienia</a></li>
+      <li><a href="#">Wyłącz</a></li>
+    </ul>
+  </div>
+
+  <!-- Okno -->
+  <div class="window" id="my-computer-window">
+    <div class="title-bar">
+      <span class="title-bar-text">Mój komputer</span>
+      <div class="title-bar-controls">
+        <button aria-label="Minimize"></button>
+        <button aria-label="Maximize"></button>
+        <button aria-label="Close" onclick="closeWindow('my-computer-window')"></button>
+      </div>
+    </div>
+    <div class="window-body">
+      <p>Witamy w systemie Windows XP!</p>
+    </div>
+  </div>
+
+  <script>
+    function toggleStartMenu() {
+      const menu = document.getElementById('start-menu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function closeWindow(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function updateClock() {
+      const clock = document.getElementById('clock');
+      const now = new Date();
+      clock.textContent = now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
