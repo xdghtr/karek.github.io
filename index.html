@@ -6,6 +6,8 @@
   <title>Windows XP</title>
   <!-- XP.css -->
   <link rel="stylesheet" href="https://unpkg.com/xp.css/dist/XP.css">
+  <!-- FontAwesome CDN dla ikon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <style>
     /* Tło pulpitu */
     body {
@@ -140,9 +142,8 @@
       width: 80px;
     }
 
-    .desktop-icon img {
-      width: 48px;
-      height: 48px;
+    .desktop-icon i {
+      font-size: 32px;
       margin-bottom: 5px;
     }
 
@@ -155,11 +156,11 @@
 <body>
   <!-- Ikony pulpitu -->
   <div class="desktop-icon" style="top: 50px; left: 50px;">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Windows_Icon.png" alt="Mój komputer">
+    <i class="fas fa-desktop"></i>
     <span>Mój komputer</span>
   </div>
   <div class="desktop-icon" style="top: 50px; left: 150px;">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Recycle_Bin_Icon.png" alt="Kosz">
+    <i class="fas fa-trash"></i>
     <span>Kosz</span>
   </div>
 
