@@ -1,193 +1,171 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows 95 Simulator</title>
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/react-windows-95@1.0.0/dist/index.js"></script>
+    <title>Portfolio Krzysztofa</title>
+    <link rel="stylesheet" href="styles.css">
     <style>
         body {
-            background-color: #008080;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Roboto', sans-serif;
             margin: 0;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
-        #root {
-            flex-grow: 1;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
         }
-
-        /* PASEK ZADAŃ */
-        .taskbar {
-            background-color: #000080;
-            padding: 10px;
-            color: white;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        header {
+            background: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
         }
-
-        .taskbar .start-btn {
-            background-color: #000080;
-            color: white;
-            border: none;
-            font-size: 14px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+        .hero {
+            text-align: center;
+            padding: 50px 0;
+            background: #007bff;
+            color: #fff;
         }
-
-        .taskbar .start-btn:hover {
-            background-color: #1e90ff;
+        .hero h1 {
+            margin: 0;
+            font-size: 3em;
         }
-
-        .taskbar .taskbar-apps {
-            display: flex;
-            gap: 10px;
+        .hero p {
+            font-size: 1.5em;
         }
-
-        .taskbar .taskbar-apps .app {
-            background-color: #1e90ff;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 4px;
-            transition: background-color 0.3s;
+        .portfolio-item {
+            background: #fff;
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
         }
-
-        .taskbar .taskbar-apps .app:hover {
-            background-color: #4682b4;
+        .portfolio-item pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border: 1px solid #ddd;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
-
-        /* STYLIZACJA OKIEN */
-        .window {
-            background-color: #ffffff;
-            border: 2px solid #000000;
-            width: 350px;
-            height: 200px;
-            position: absolute;
-            top: 50px;
-            left: 50px;
-            display: none;
-            z-index: 10;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease-out;
-        }
-
-        .window-header {
-            background-color: #000080;
-            color: white;
-            padding: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: move;
-        }
-
-        .window-header span {
-            font-weight: bold;
-        }
-
-        .window-body {
-            padding: 10px;
-            font-size: 14px;
-            overflow-y: auto;
-        }
-
-        .window-header .close-btn {
-            background-color: red;
-            color: white;
-            border: none;
-            padding: 5px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .window-header .close-btn:hover {
-            background-color: darkred;
-        }
-
-        /* Stylizacja dla tekstowego edytora */
-        textarea {
-            width: 100%;
-            height: 100%;
-            border: none;
-            resize: none;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 14px;
+        footer {
+            text-align: center;
+            padding: 20px 0;
+            background: #333;
+            color: #fff;
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>Portfolio Krzysztofa</h1>
+    </header>
+    <div class="hero">
+        <div class="container">
+            <h1>Witaj na moim portfolio</h1>
+            <p>Odkryj moje zaawansowane projekty i osiągnięcia.</p>
+        </div>
+    </div>
+    <div class="container">
+        <div class="portfolio-item">
+            <h2>Projekt Pierwszy: Rozproszony System Mikroserwisów</h2>
+            <p>Stworzyłem rozproszony system mikroserwisów z użyciem Docker, Kubernetes oraz Google Cloud Platform. System zarządza danymi użytkowników i zapewnia skalowalność.</p>
+            <pre><code>
+// Przykładowy kod konfiguracji Kubernetes
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      containers:
+      - name: user-service
+        image: gcr.io/myproject/user-service:latest
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+            </code></pre>
+        </div>
+        <div class="portfolio-item">
+            <h2>Projekt Drugi: Aplikacja AI do Rozpoznawania Obrazów</h2>
+            <p>Opracowałem aplikację AI do rozpoznawania obrazów z użyciem TensorFlow i PyTorch. Aplikacja analizuje obrazy i kategoryzuje je z wysoką dokładnością.</p>
+            <pre><code>
+// Przykładowy kod TensorFlow
+import tensorflow as tf
+from tensorflow.keras import datasets, layers, models
 
-<div id="root"></div>
+# Załaduj i przetwórz dane
+(train_images, train_labels), (test_images, test_labels) = datasets.cifar10.load_data()
+train_images, test_images = train_images / 255.0, test_images / 255.0
 
-<script>
-    const { Window, Taskbar, StartMenu, Button, TaskbarApp } = ReactWindows95;
+# Zbuduj model
+model = models.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.Flatten(),
+    layers.Dense(64, activation='relu'),
+    layers.Dense(10)
+])
 
-    // Prosta animacja dla okienek
-    function moveWindow(event, windowId) {
-        const windowElement = document.getElementById(windowId);
-        let offsetX = event.clientX - windowElement.offsetLeft;
-        let offsetY = event.clientY - windowElement.offsetTop;
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
 
-        function dragMove(event) {
-            windowElement.style.left = `${event.clientX - offsetX}px`;
-            windowElement.style.top = `${event.clientY - offsetY}px`;
-        }
+model.fit(train_images, train_labels, epochs=10, 
+          validation_data=(test_images, test_labels))
+            </code></pre>
+        </div>
+        <div class="portfolio-item">
+            <h2>Projekt Trzeci: Zaawansowany CMS</h2>
+            <p>Opracowałem zaawansowany system zarządzania treścią (CMS) z użyciem Django, PostgreSQL oraz GraphQL. System umożliwia elastyczne zarządzanie treścią i integrację z różnymi usługami.</p>
+            <pre><code>
+// Przykładowy kod Django + GraphQL
+import graphene
+from graphene_django.types import DjangoObjectType
+from myapp.models import Article
 
-        function dragEnd() {
-            windowElement.removeEventListener('mousemove', dragMove);
-            windowElement.removeEventListener('mouseup', dragEnd);
-        }
+class ArticleType(DjangoObjectType):
+    class Meta:
+        model = Article
 
-        windowElement.addEventListener('mousemove', dragMove);
-        windowElement.addEventListener('mouseup', dragEnd);
-    }
+class Query(graphene.ObjectType):
+    all_articles = graphene.List(ArticleType)
 
-    function App() {
-        return (
-            <div style={{ height: '100%', position: 'relative' }}>
-                {/* Taskbar */}
-                <div className="taskbar">
-                    <button className="start-btn">Start</button>
-                    <div className="taskbar-apps">
-                        <div className="app" onClick={() => toggleWindow('my-computer')}>My Computer</div>
-                        <div className="app" onClick={() => toggleWindow('notepad')}>Notepad</div>
-                    </div>
-                </div>
+    def resolve_all_articles(self, info, **kwargs):
+        return Article.objects.all()
 
-                {/* Okno "My Computer" */}
-                <Window id="my-computer" title="My Computer" style={{ top: '100px', left: '50px' }} onMouseDown={(event) => moveWindow(event, 'my-computer')}>
-                    <div className="window-body">
-                        <p>This is your "My Computer" window.</p>
-                    </div>
-                </Window>
-
-                {/* Okno "Notepad" */}
-                <Window id="notepad" title="Notepad" style={{ top: '250px', left: '50px' }} onMouseDown={(event) => moveWindow(event, 'notepad')}>
-                    <div className="window-body">
-                        <textarea rows="10" cols="30">Type your text here...</textarea>
-                    </div>
-                </Window>
-            </div>
-        );
-    }
-
-    function toggleWindow(windowId) {
-        const windowElement = document.getElementById(windowId);
-        windowElement.style.display = windowElement.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // Renderowanie aplikacji
-    ReactDOM.render(<App />, document.getElementById('root'));
-</script>
+schema = graphene.Schema(query=Query)
+            </code></pre>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; 2025 Portfolio Krzysztofa. Wszelkie prawa zastrzeżone.</p>
+    </footer>
 </body>
 </html>
