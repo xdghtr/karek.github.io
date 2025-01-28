@@ -6,12 +6,17 @@
     <title>Portfolio Chris</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
         body {
             font-family: 'Roboto', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
             color: #333;
+            animation: fadeIn 1s ease-in-out;
         }
         .container {
             max-width: 1200px;
@@ -23,12 +28,14 @@
             color: #fff;
             padding: 20px 0;
             text-align: center;
+            animation: fadeIn 2s ease-in-out;
         }
         .hero {
             text-align: center;
             padding: 50px 0;
             background: #007bff;
             color: #fff;
+            animation: fadeIn 2s ease-in-out;
         }
         .hero h1 {
             margin: 0;
@@ -42,6 +49,14 @@
             margin: 20px 0;
             padding: 20px;
             border: 1px solid #ddd;
+            opacity: 0;
+            animation: fadeIn 2s ease-in-out forwards;
+        }
+        .portfolio-item:nth-child(odd) {
+            animation-delay: 0.5s;
+        }
+        .portfolio-item:nth-child(even) {
+            animation-delay: 1s;
         }
         .portfolio-item pre {
             background: #f4f4f4;
@@ -56,6 +71,7 @@
             padding: 20px 0;
             background: #333;
             color: #fff;
+            animation: fadeIn 2s ease-in-out;
         }
     </style>
 </head>
@@ -106,7 +122,6 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 8080
-  type: LoadBalancer
             </code></pre>
         </div>
         <div class="portfolio-item">
@@ -131,14 +146,14 @@ model = models.Sequential([
     layers.Flatten(),
     layers.Dense(64, activation='relu'),
     layers.Dense(10)
-])
+]);
 
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              metrics=['accuracy'])
+              metrics=['accuracy']);
 
 model.fit(train_images, train_labels, epochs=10, 
-          validation_data=(test_images, test_labels))
+          validation_data=(test_images, test_labels));
             </code></pre>
         </div>
         <div class="portfolio-item">
@@ -158,14 +173,14 @@ class Query(graphene.ObjectType):
     all_articles = graphene.List(ArticleType)
 
     def resolve_all_articles(self, info, **kwargs):
-        return Article.objects.all()
+        return Article.objects.all();
 
-schema = graphene.Schema(query=Query)
+schema = graphene.Schema(query=Query);
             </code></pre>
         </div>
     </div>
     <footer>
-        <p>&copy; 2021 Portfolio Chris. Wszelkie prawa zastrzeżone.</p>
+        <p>&copy; 2025 Portfolio Chris. Wszelkie prawa zastrzeżone.</p>
     </footer>
 </body>
 </html>
